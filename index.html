@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>مقارنة الأسعار</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ الرئيسية ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="topbar">
+      <button class="icon-btn" id="btn-go-stores">⚙️</button>
+      <span class="topbar-title">مقارنة الأسعار</span>
+      <button class="topbar-btn" id="btn-go-add">+ فاتورة</button>
+    </div>
+    <div class="screen-body">
+      <p class="hint" id="home-hint">اضغط على أي منتج لمقارنة سعره</p>
+      <div id="products-list"></div>
+      <div id="home-empty" class="empty hidden">
+        <div class="empty-icon">🛒</div>
+        <div class="empty-text">لا توجد منتجات بعد</div>
+        <button class="btn-main" id="btn-empty-add">أضف أول فاتورة</button>
+      </div>
+    </div>
+    <!-- شريط التصدير والاستيراد -->
+    <div class="bottom-bar">
+      <button class="bar-btn" id="btn-export">📤 تصدير البيانات</button>
+      <button class="bar-btn" id="btn-import-trigger">📥 استيراد البيانات</button>
+      <input type="file" id="btn-import" accept=".json" class="hidden">
+    </div>
+  </div>
+
+  <!-- ══ مقارنة منتج ══ -->
+  <div class="screen hidden" id="screen-compare">
+    <div class="topbar">
+      <button class="back-btn" id="btn-back-compare">→</button>
+      <span class="topbar-title" id="compare-title"></span>
+    </div>
+    <div class="screen-body">
+      <div id="compare-summary"></div>
+      <div id="compare-list"></div>
+    </div>
+  </div>
+
+  <!-- ══ إضافة فاتورة ══ -->
+  <div class="screen hidden" id="screen-add">
+    <div class="topbar">
+      <button class="back-btn" id="btn-back-add">→</button>
+      <span class="topbar-title">فاتورة جديدة</span>
+    </div>
+    <div class="screen-body">
+
+      <!-- صورة الفاتورة -->
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="img-upload" accept="image/*" capture="environment" class="file-input">
+        <div id="upload-placeholder" class="upload-placeholder">
+          <span class="upload-icon">📷</span>
+          <span class="upload-text">صوّر الفاتورة (اختياري)</span>
+        </div>
+        <img id="img-preview" class="img-preview hidden" alt="صورة الفاتورة">
+        <button id="btn-remove-img" class="remove-img-btn hidden">✕ إزالة</button>
+      </div>
+
+      <!-- اختيار المحل -->
+      <div class="section-label">اختر المحل</div>
+      <div id="store-btns" class="store-grid"></div>
+      <div id="new-store-row" class="new-store-row hidden">
+        <input id="f-new-store" type="text" class="store-input" placeholder="اسم المحل الجديد...">
+        <button class="btn-confirm-store" id="btn-confirm-store">✓</button>
+      </div>
+
+      <!-- التاريخ -->
+      <div class="field-group">
+        <label>التاريخ</label>
+        <input id="f-date" type="date">
+      </div>
+
+      <!-- الأصناف -->
+      <div class="section-label">الأصناف</div>
+      <div id="items-added"></div>
+
+      <div class="item-form">
+        <div class="field-group" style="position:relative">
+          <label>اسم الصنف</label>
+          <input id="f-name" type="text" placeholder="أرز، حليب، عصير...">
+          <div id="suggestions" class="suggestions hidden"></div>
+        </div>
+        <div class="field-group">
+          <label>نوع العبوة</label>
+          <div class="unit-row">
+            <button class="unit-btn active" data-unit="حبة"   data-label="عدد الحبات">حبة</button>
+            <button class="unit-btn" data-unit="كيلو"  data-label="الوزن (كيلو)">كيلو</button>
+            <button class="unit-btn" data-unit="لتر"   data-label="الحجم (لتر)">لتر</button>
+            <button class="unit-btn" data-unit="علبة"  data-label="عدد العلب">علبة</button>
+            <button class="unit-btn" data-unit="كرتون" data-label="عدد الكراتين">كرتون</button>
+            <button class="unit-btn" data-unit="باكيت" data-label="عدد الباكيتات">باكيت</button>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field-group">
+            <label>سعر العبوة (د.ك)</label>
+            <input id="f-pack-price" type="number" placeholder="0.000" step="0.001" min="0">
+          </div>
+          <div class="field-group">
+            <label id="pack-size-label">عدد الحبات</label>
+            <input id="f-pack-size" type="number" placeholder="1" min="1" value="1">
+          </div>
+        </div>
+        <div class="unit-price-box hidden" id="unit-price-box">
+          <span class="upl">سعر الوحدة تلقائياً</span>
+          <span class="upv" id="unit-price-val">—</span>
+        </div>
+        <div class="field-group">
+          <label>الكمية</label>
+          <input id="f-qty" type="number" placeholder="1" min="1" value="1">
+        </div>
+        <button class="btn-secondary" id="btn-add-item">+ إضافة الصنف</button>
+      </div>
+
+      <button class="btn-main" id="btn-save">💾 حفظ الفاتورة</button>
+    </div>
+  </div>
+
+  <!-- ══ إدارة المحلات ══ -->
+  <div class="screen hidden" id="screen-stores">
+    <div class="topbar">
+      <button class="back-btn" id="btn-back-stores">→</button>
+      <span class="topbar-title">إدارة المحلات</span>
+    </div>
+    <div class="screen-body">
+      <div class="add-store-form">
+        <input id="f-new-store-mgr" type="text" class="store-input" placeholder="اسم محل جديد...">
+        <button class="btn-confirm-store" id="btn-add-store-mgr">+</button>
+      </div>
+      <div class="section-label">المحلات المحفوظة</div>
+      <div id="stores-mgr-list"></div>
+    </div>
+  </div>
+
+  <!-- ══ تفاصيل فاتورة ══ -->
+  <div class="screen hidden" id="screen-invoice">
+    <div class="topbar">
+      <button class="back-btn" id="btn-back-invoice">→</button>
+      <span class="topbar-title" id="invoice-screen-title"></span>
+      <button class="icon-btn danger-btn" id="btn-delete-invoice">🗑</button>
+    </div>
+    <div class="screen-body">
+      <img id="invoice-img-view" class="invoice-img-full hidden" alt="صورة الفاتورة">
+      <div id="invoice-detail-body"></div>
+    </div>
+  </div>
+
+</div>
+<div id="toast" class="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
